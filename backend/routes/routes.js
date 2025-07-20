@@ -1,6 +1,7 @@
 const express =require("express")
-const {handlersingup_user, dbconnect}=require("../controller/control")
+const {handlersingup_user, handlersignup_ejs}=require("../controller/control")
 const router=express.Router()
 
-const signup =router.post("/",handlersingup_user)
-module.exports={signup}
+router.get("/",handlersignup_ejs)
+router.post("/",handlersingup_user)
+module.exports=router
