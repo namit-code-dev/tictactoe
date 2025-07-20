@@ -20,4 +20,8 @@ async function handlersingup_user(req,res) {
 res.send("done")
 console.log(req.body);
 }
-module.exports={handlersingup_user,dbconnect}
+
+async function handlersignup_ejs(req,res) {
+    res.render("login")  
+}
+module.exports={handlersingup_user,dbconnect,handlersignup_ejs}
