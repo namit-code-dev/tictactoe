@@ -16,7 +16,6 @@ async function dbconnect(url) {
 }
 
 async function handlersingup_user(req, res) {
-
   const { fullname, email, age, password } = req.body
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
@@ -26,7 +25,7 @@ async function handlersingup_user(req, res) {
     age,
     password: hash
   })
-  res.send("done")
+  res.send("/backend/views/login.ejs")
   if (!usercreate) {
     res.status(404).send("something went wrong")
   }
@@ -35,27 +34,28 @@ async function handlersingup_user(req, res) {
 
 async function handlelogin(req, res) {
   try {
-    const  findemail= req.body.email
-    const  password=req.body.password
-    const finddb = await model.find({ email: findemail });
-    if (finddb.length === 0) {
-  return res.status(404).json({ message: "User not found" });
-}
-  
-  
-      bcrypt.compare(password,process.env.hidden_bcrypt_pass, function(err, result) {
-    console.log(result)
-});
-      const token = jwt.sign(findemail, process.env.hidden_bcrypt_pass)
-      res.cookie("cookies", token)
-      res.send("cookie set");
-      console.log(req.cookies);
-    
+    const findemail = req.body.email
+    const password = req.body.password
+    const finddb = await model.findOne({ email: findemail });
+    if (!finddb) {
+      return res.status(404).send("<h1>SOMETHING WENT WRONG</h1>");
+    }
+    bcrypt.compare(password, finddb.password, function (err, result) {
+      if (result) {
+        const token = jwt.sign(findemail, process.env.hidden_bcrypt_pass)
+        res.cookie("cookies", token)
+      }
+      else {
+        res.send("<h1>SOMETHING WENT WRONG</h1>");
+      }
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 }
+
+
 
 
 async function handlersignup_ejs(req, res) {
