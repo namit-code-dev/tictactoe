@@ -1,3 +1,7 @@
 const express =require("express")
 const router=express.Router()
-router.get("/index.html",handleindexhtml)
+const {handleindexhtml}=require("../controller/control")
+router.get("/",handleindexhtml)
+
+
+module.exports=router
