@@ -27,7 +27,7 @@ async function handlersingup_user(req, res) {
     age,
     password: hash
   })
-  res.send("/login")}
+  res.redirect("/login")}
   catch(err){
    if (err.code==11000) {
     res.send("<h1>It Seems You Have An Account With This email</h1>")
