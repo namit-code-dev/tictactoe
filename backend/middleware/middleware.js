@@ -15,6 +15,8 @@ app.use("/signup",router)
 app.use(cookieParser())
 app.use("/login",router_login)
 app.use("/namitgame",htmlroute)
+app.use("/img", express.static(path.join(__dirname, "../../docs/images_ejs")))
 app.use("/namitgame",handleindexhtml,express.static(path.join(__dirname, "../../docs")));
+
 }
 module.exports=middlewares
