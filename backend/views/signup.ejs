@@ -1,17 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>sing-up</title>
-</head>
+    <title>SIGNUP</title>
 <style>
    body,
     html {
       height: 100%;
       width: 100%;
       margin: 0;
+      overflow: hidden;
     }
 
     .signupimg {
@@ -28,7 +27,7 @@
 
     .signup{
         display: flex;
-        height: 70%;
+        height: 75%;
         width: 70%;
         border-radius: 12px;
     }
@@ -52,14 +51,14 @@
     }
       .signup_right>h2{
         color: gray;
-        font-size: 1vw;
+        font-size: 1.2vw;
       }
-    #name,#email,#age,#password{
+    #name,#email,#age,#password,#button{
         margin-left:2vw ;
          display: flex;
        flex-direction: column;
        height: 5vh;
-       width: 15vw;
+       width: 20vw;
        margin-bottom: 2vh;
        outline: none;
        border: none;
@@ -74,20 +73,49 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5vw; 
+    gap: 0.5vw;
     font-size: 1vw;
     cursor: pointer;
-    border-radius: 10px;
-     margin-left:2vw ;
 }
 
 label{
     padding-left: 2vw;
 }
+@media only screen and (min-width: 500px) and (max-width: 630px) {
+ .signup{
+        width: 80%;
+    }
+#name,#email,#age,#password,#button{
+    width: 30vw;}
 
-   
+}
+@media only screen and (min-width: 200px) and (max-width: 500px) {
+     .signup{
+        display: flex;
+        flex-direction: column;
+         height: 100%;
+        width: 100%;
+    }
+        .signup_left{
+        height: 30%;
+        width: 100%;
+    }
+     .signup_right{
+       height: 70%;
+        width: 100%;
+    }
+      .signup_right>h2{
+        font-size: 3.2vw;
+      }
+   #name, #email, #age, #password, #button {
+    width: 81vw;
+}
+ #button{
+    font-size: 3.2vw;
+ }
+ }
 </style>
-
+</head>
 <body>
     <div class="signupimg">
        
@@ -115,5 +143,4 @@ label{
               </div>
     </div>
 </body>
-
 </html>
