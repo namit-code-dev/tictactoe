@@ -2,7 +2,7 @@ const mongoose = require("mongoose")
 const model = require("../model/model")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
-
+const path = require("path");
 
 
 async function dbconnect(url) {
@@ -14,6 +14,7 @@ async function dbconnect(url) {
     console.log("not connected");
   }
 }
+
 
 async function handlersingup_user(req, res) {
   const { fullname, email, age, password } = req.body
@@ -32,6 +33,7 @@ async function handlersingup_user(req, res) {
 }
 
 
+
 async function handlelogin(req, res) {
   try {
     const findemail = req.body.email
@@ -44,7 +46,9 @@ async function handlelogin(req, res) {
       if (result) {
         const token = jwt.sign(findemail, process.env.hidden_bcrypt_pass)
         res.cookie("cookies", token)
+        return res.redirect("/namitgame");
       }
+
       else {
         res.send("<h1>SOMETHING WENT WRONG</h1>");
       }
@@ -56,10 +60,33 @@ async function handlelogin(req, res) {
 }
 
 
+async function handleindexhtml(req, res, next) {
+  const cookie = req.cookies.cookies
+
+  if (!cookie) {
+    return res.send("<h1>ACCESS DENIED</h1>");
+  }
+  try {
+    const token_verify = jwt.verify(cookie, process.env.hidden_bcrypt_pass)
+    if (token_verify) {
+      return next()
+
+    }
+    else {
+      console.log(false)
+      return res.send("<h1>ACCESS DENIED</h1>");
+    }
+  }
+  catch (err) {
+    console.log(err)
+  }
+
+}
 
 
 async function handlersignup_ejs(req, res) {
   res.render("signup")
 }
-module.exports = { handlersingup_user, dbconnect, handlersignup_ejs, handlelogin }
+module.exports = { handlersingup_user, dbconnect, handlersignup_ejs, handlelogin, handleindexhtml }
+
 
