@@ -1,18 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>sing-up</title>
 </head>
+<style>
+   body,
+    html {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+    }
+
+    .signupimg {
+      height: 100vh;
+      width: 100vw;
+      background-image: url("/img/image.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .signup{
+        display: flex;
+        height: 70%;
+        width: 70%;
+        border-radius: 12px;
+    }
+    .signup_left{
+        height: 100%;
+        width: 50%;
+    }
+    .signup_left>img{
+         height: 100%;
+        width:  100%;
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
+    }
+    .signup_right{
+       height: 100%;
+        width: 50%;
+         border-top-right-radius: 12px;
+        border-bottom-right-radius: 12px;
+        background-color: aliceblue;
+        padding-left:2vw ;
+    }
+      .signup_right>h2{
+        color: gray;
+        font-size: 1vw;
+      }
+    #name,#email,#age,#password{
+        margin-left:2vw ;
+         display: flex;
+       flex-direction: column;
+       height: 5vh;
+       width: 15vw;
+       margin-bottom: 2vh;
+       outline: none;
+       border: none;
+       border: 3px solid;
+       border-image: linear-gradient(to right, yellow, red, blue) 1;
+    }
+
+    #button {
+    text-align: center;
+    background-color: blueviolet;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5vw; 
+    font-size: 1vw;
+    cursor: pointer;
+    border-radius: 10px;
+     margin-left:2vw ;
+}
+
+label{
+    padding-left: 2vw;
+}
+
+   
+</style>
+
 <body>
-    <h1>singup</h1>
-    <form action="/signup" method="post">
-        <input type="text" name="fullname" placeholder="fullname">
-        <input type="email" name="email" placeholder="namit@example.com">
-        <input type="number" name="age" placeholder="age" >
-        <input type="password" name="password" placeholder="namitex345">
-        <button type="submit" placeholder="button">click me</button>
-    </form>
+    <div class="signupimg">
+       
+        <div class="signup">
+            <div class="signup_left">
+                <img src="/img/image.png" alt="" srcset="">
+            </div>
+            <div class="signup_right">
+                <h1>Create an account</h1>
+                <h2>Already have an account ? <a href="/login">login</a></h2>
+                <div class="signupform">
+                <form action="/signup" method="post">
+                    <label >Fullname</label>
+                    <input type="text" name="fullname" placeholder="fullname" id="name">
+                    <label >Email</label>
+                    <input type="email" name="email" placeholder="namit@example.com" id="email">
+                    <label >Age</label>
+                    <input type="number" name="age" placeholder="age" id="age">
+                    <label>password</label>
+                    <input type="password" name="password" placeholder="namitex345" id="password">
+                    <button type="submit" id="button" placeholder="button">LOGIN </button>
+                </form>
+                </div>
+            </div>
+              </div>
+    </div>
 </body>
+
 </html>
