@@ -20,13 +20,19 @@ async function handlersingup_user(req, res) {
   const { fullname, email, age, password } = req.body
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
+  try{
   const usercreate = await model.create({
     fullname,
     email,
     age,
     password: hash
   })
-  res.send("/backend/views/login.ejs")
+  res.send("/login")}
+  catch(err){
+   if (err.code==11000) {
+    res.send("<h1>It Seems You Have An Account With This email</h1>")
+   }
+  }
   if (!usercreate) {
     res.status(404).send("something went wrong")
   }
