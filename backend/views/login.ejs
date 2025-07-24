@@ -4,15 +4,146 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LOGIN</title>
+   <style>
+    *{
+    padding: 0;
+    margin: 0;
+    }
+    body,html{
+        overflow: hidden;
+    }
+.login{
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+#login_left{
+    height: 100%;
+    width: 50%;
+   
+}
+
+#loginpage{
+     height: 100%;
+     width: 100%;
+     margin: 5vw;
+     margin-top: 2vh;
+     margin-right: 5vw;
+}
+#loginpage>h1{
+    margin-bottom: 3vh;
+}
+#loginpage>h3{
+    margin-bottom: 3vh;
+    color: gray;
+}
+#signin{
+    margin-bottom: 3vh;
+    color: gray;
+    
+}
+#signin>u{
+    color: blueviolet;
+}
+#email,#password,#button{
+    margin-bottom: 3vh;
+    height: 5vh;
+    width: 25vw;
+    border:3px solid; 
+    padding-left: 3px;
+  border-image: linear-gradient(to right, yellow, red, blue) 1;
+}
+#email,#password,#button:focus {
+  outline: none;
+  border-color: transparent; 
+}
+#button{
+     height: 6vh;
+     width: 25.5vw;
+    background-color: rgb(9, 9, 9);
+    color: aliceblue;
+    outline: none;
+}
+svg{
+    height: 15vh;
+    width: 20vw;
+}
+#login_left>img{
+    height:16vh;
+    width: 15vw;
+    padding-right:12vh;
+}
+#login_right{
+    height: 100%;
+    width: 50%;
+    background-image: url("/img/loginimage.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+@media (min-width: 500px) and (max-width: 1024px){
+  #email,#password,#button{
+    width: 37vw;
+  }  
+  svg {
+    height: 12vh;
+    width: 22vw;
+}
+}
+@media (max-width: 480px) {
+    .login{
+        display:flex;
+        flex-direction: column; 
+    }
+    #login_left{
+        width: 100%;
+    }
+    #loginpage{
+        margin-left: 15vw;
+        
+    }
+    #email,#password,#button{
+    height: 5vh;
+    width: 55vw;
+  } 
+   svg {
+    height: 12vh;
+    width: 22vw;
+}
+#login_right{
+    margin-left: 55vw;
+    width: 40%;
+}
+}
+
+   </style>
 </head>
 <body>
-    <h1>LOGIN</h1>
-    <div id="login">
+    <div class="login">
+    <div id="login_left">
+    <img src="/img/3835.jpg" alt="" srcset="">
+    <div id="loginpage">
+        <h1>Welcome back</h1>
+        <h3>please enter your details</h3>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+  <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+  <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+</svg>
         <form action="/login" method="post">
-            <input type="email" name="email" id="email" placeholder="email">
-            <input type="password" name="password" id="password" placeholder="password">
-            <button type="submit" id="submit_btn">LOGIN</button>
+            <label for="email" id="emaillabel">email</label><br>
+            <input type="email" name="email" id="email" ><br>
+            <label for="password" id="passwordlabel">password</label><br>
+            <input type="password" name="password" id="password" >
+            <button type="submit" id="button">LOGIN</button>
+            <h4 id="signin">Dont have an account ? <a href="/signup">signin</a></h4>
         </form>
+ </div>
+     
+    </div>
+     <div id="login_right">
+          <!-- <div id="symbol"> <img src="/img/loginimage.jpg" alt="image not loaded"></div> -->
+     </div>
     </div>
 </body>
 </html>
