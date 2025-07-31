@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+<input type="number" id="room">
+<button id="button">click me</button>
+<button id="generate">generate</button>
+<h2 id="code"></h2>
+<h3 id="verify"></h3>
+</body>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    //client
+let socket = io("/gameoption");
+generate = document.getElementById("generate");
+generate.addEventListener("click", connectroom);
+
+function connectroom() {
+  socket.emit("getCode")
+}
+
+
+let receivedCode = null;
+function roomcodeset(){
+let coderoom = document.getElementById("code");
+socket.on("roomCode", (code_string) => {
+ receivedCode = code_string;
+ coderoom.innerText=code_string
+})
+}
+roomcodeset();
+
+let button= document.getElementById("button");
+button.addEventListener("click",()=>{
+let room = document.getElementById("room").value
+    socket.emit("verifycode",room)
+})
+
+
+
+
+</script>
+</html>
