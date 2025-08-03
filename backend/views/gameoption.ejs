@@ -107,9 +107,11 @@
       <h2>Offline Player</h2>
       <button>Play Offline</button>
     </div>
-
+     
   </div>
-
+   <div id="msg">
+    <h3 id="msg_content"></h3>
+   </div>
 </body>
 </html>
 
@@ -145,11 +147,27 @@ button.addEventListener("click", () => {
     hasJoined = true;
 });
 
-// socket.on("message",(data)=>{
-//   console.log("data:",data)
-// })
-
-
+socket.on("message",(data)=>{
+  console.log("data:",data)
+  if(data=="Joined successfully"){
+    window.location.href="/namitgame"
+  }
+  else if(data== "Room full"){
+    alert("ROOM IS FULL ! PLEASE JOIN ANOTHER ROOM")
+    location.reload()
+  }
+   else if(data== "Room not found"){
+    alert("INVALD ROOM ID !! PLEASE ENTER VALID ROOM ID")
+    location.reload()
+  }
+    else if(data== "Msg"){
+   let msg_content=document.getElementById("msg_content").innerText
+   msg_content="SEND THIS CODE TO YOUR OPPONENT !! AND WAIT FOR THEIR JOINING"
+  }
+  else{
+    console.error("Error while joining");
+  }
+})
 
 </script>
 </html>
