@@ -1,18 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Room App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .card {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 30%;
+      min-width: 280px;
+      box-sizing: border-box;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-size: 1.5rem;
+      text-align: center;
+    }
+
+    .card input, .card button {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    .card button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .card button:hover {
+      background-color: #45a049;
+    }
+
+    #code {
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: green;
+    }
+
+    #verify {
+      text-align: center;
+      color: red;
+    }
+
+   @media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card {
+    width: 90%;
+  }
+}
+
+
+  </style>
 </head>
 <body>
 
-<input type="number" id="room">
-<button id="button">click me</button>
-<button id="generate">generate</button>
-<h2 id="code"></h2>
-<h3 id="verify"></h3>
+  <h1 style="text-align: center;">Room Manager</h1>
+  <div class="container">
+
+    <!-- Create Room -->
+    <div class="card">
+      <h2>Create Room</h2>
+      <button id="generate">Generate Code</button>
+      <p id="code">----</p>
+    </div>
+
+    <!-- Join Room -->
+    <div class="card">
+      <h2>Join Room</h2>
+      <input type="number" id="room" placeholder="Enter Room Code">
+      <button id="button">Join Room</button>
+      <h3 id="verify"></h3>
+    </div>
+
+    <!-- Offline Player -->
+    <div class="card">
+      <h2>Offline Player</h2>
+      <button>Play Offline</button>
+    </div>
+
+  </div>
+
 </body>
+</html>
+
 <script src="/socket.io/socket.io.js"></script>
 <script>
     //client
@@ -26,21 +126,28 @@ function connectroom() {
 
 
 let receivedCode = null;
-function roomcodeset(){
+
 let coderoom = document.getElementById("code");
 socket.on("roomCode", (code_string) => {
- receivedCode = code_string;
- coderoom.innerText=code_string
-})
-}
-roomcodeset();
-
-let button= document.getElementById("button");
-button.addEventListener("click",()=>{
-let room = document.getElementById("room").value
-    socket.emit("verifycode",room)
+receivedCode = code_string;
+coderoom.innerText=code_string
 })
 
+
+
+let hasJoined = false;
+
+let button = document.getElementById("button");
+button.addEventListener("click", () => {
+    if (hasJoined) return;
+    let room = document.getElementById("room").value;
+    socket.emit("verifycode", room);
+    hasJoined = true;
+});
+
+// socket.on("message",(data)=>{
+//   console.log("data:",data)
+// })
 
 
 
