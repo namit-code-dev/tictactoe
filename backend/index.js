@@ -38,14 +38,16 @@ gameoption.on("connection", (socket) => {
             const roomdata = await room.create({
                 roomid: code_string,
                 players: [socket.id]
-            })
-            console.log(roomdata)
+            })  
+           socket.join(code_string); 
+           socket.emit("message","Msg")
+           console.log(roomdata)
         }
         catch (err) {
             console.error(" Room creation error:", err.message);
         }
-
         socket.emit("roomCode", code_string);
+      
     });
 
     socket.on("verifycode", async (roomcode) => {
@@ -76,10 +78,11 @@ gameoption.on("connection", (socket) => {
                 console.error("Error while saving updated room:", e);
             }
 
-            socket.join(roomcode);
-            console.log(`${socket.id} joined room ${roomcode}`);
-            socket.emit("message", "Joined successfully");
-            console.log("Room state:", roomid);
+            if (roomid.players.length == 2) {
+                socket.join(roomcode);
+                gameoption.to(roomcode).emit("message", "Joined successfully");
+            }
+    
 
         } catch (err) {
             console.error("Error while searching room:", err.message);
