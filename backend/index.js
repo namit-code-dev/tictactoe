@@ -8,13 +8,13 @@ const server = http.createServer(app)
 const { Server } = require("socket.io");
 const path = require("path");
 const io = new Server(server)
-
+const mongoose = require("mongoose")
+const room = require("./model/roommodel")
 const dotenv = require("dotenv")
 dotenv.config()
 
 //database connect
 dbconnect(process.env.mongodb)
-
 //middleware
 middlewares(app)
 
@@ -27,29 +27,68 @@ app.get("/login", (req, res) => {
 })
 
 //server
-let verifycode = null
+
 const gameoption = io.of("/gameoption");
 gameoption.on("connection", (socket) => {
     console.log("Client connected:", socket.id);
-
-    socket.on("getCode", () => {
+    socket.on("getCode", async () => {
         const code = Math.floor(Math.random() * 9000) + 1000;
         const code_string = code.toString()
-        verifycode = code_string
+        try {
+            const roomdata = await room.create({
+                roomid: code_string,
+                players: [socket.id]
+            })
+            console.log(roomdata)
+        }
+        catch (err) {
+            console.error(" Room creation error:", err.message);
+        }
+
         socket.emit("roomCode", code_string);
     });
-    socket.on("verifycode", (roomcode) => {
-        if (roomcode == verifycode) {
-            console.log(true)
-            socket.emit("message", true)
+
+    socket.on("verifycode", async (roomcode) => {
+        try {
+            const roomid = await room.findOne({ roomid: roomcode.toString() });
+
+            if (!roomid) {
+                console.log("Room not found");
+                socket.emit("message", "Room not found");
+                return;
+            }
+
+            if (roomid.players.includes(socket.id)) {
+                console.log(`${socket.id} already in room ${roomcode}`);
+                return;
+            }
+
+            if (roomid.players.length >= 2) {
+                console.log("Room full");
+                socket.emit("message", "Room full");
+                return;
+            }
+
+            try {
+                roomid.players.push(socket.id);
+                await roomid.save();
+            } catch (e) {
+                console.error("Error while saving updated room:", e);
+            }
+
+            socket.join(roomcode);
+            console.log(`${socket.id} joined room ${roomcode}`);
+            socket.emit("message", "Joined successfully");
+            console.log("Room state:", roomid);
+
+        } catch (err) {
+            console.error("Error while searching room:", err.message);
         }
-        else {
-            console.log(false)
-            socket.emit("message", false)
-        }
+
+        console.log(`verifycode from ${socket.id} for room ${roomcode}`);
     });
-});
 
 
+})
 //app listen
 server.listen(port, () => console.log(`Server started on http://localhost:${port}`))
