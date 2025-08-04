@@ -52,7 +52,7 @@ async function handlelogin(req, res) {
       if (result) {
         const token = jwt.sign(findemail, process.env.hidden_bcrypt_pass)
         res.cookie("cookies", token)
-        return res.redirect("/namitgame");
+        return res.redirect("/gameoption");
       }
 
       else {
