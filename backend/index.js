@@ -1,97 +1,158 @@
-const express = require("express")
-const http = require("http")
-const app = express()
+const express = require("express");
+const http = require("http");
+const app = express();
 const port = process.env.PORT || 3000;
-const { dbconnect } = require("./controller/control")
-const middlewares = require("./middleware/middleware")
-const server = http.createServer(app)
+
+const { dbconnect } = require("./controller/control");
+const middlewares = require("./middleware/middleware");
+
+const server = http.createServer(app);
 const { Server } = require("socket.io");
+const io = new Server(server);
+
 const path = require("path");
-const io = new Server(server)
-const mongoose = require("mongoose")
-const room = require("./model/roommodel")
-const dotenv = require("dotenv")
-dotenv.config()
+const room = require("./model/roommodel");
+const dotenv = require("dotenv");
+dotenv.config();
 
-//database connect
-dbconnect(process.env.mongodb)
-//middleware
-middlewares(app)
+dbconnect(process.env.mongodb);
+middlewares(app);
 
-//view engine
-app.set("view engine", "ejs")
-app.set('views', __dirname + '/views');
+app.set("view engine", "ejs");
+app.set("views", __dirname + "/views");
+app.use(express.static(path.join(__dirname, "namitgame")));
 
 app.get("/login", (req, res) => {
-    res.render("login")
-})
-
-//server
+  res.render("login");
+});
 
 const gameoption = io.of("/gameoption");
+
 gameoption.on("connection", (socket) => {
-    console.log("Client connected:", socket.id);
-    socket.on("getCode", async () => {
-        const code = Math.floor(Math.random() * 9000) + 1000;
-        const code_string = code.toString()
-        try {
-            const roomdata = await room.create({
-                roomid: code_string,
-                players: [socket.id]
-            })  
-           socket.join(code_string); 
-           socket.emit("message","Msg")
-           console.log(roomdata)
-        }
-        catch (err) {
-            console.error(" Room creation error:", err.message);
-        }
-        socket.emit("roomCode", code_string);
-      
+  console.log("Client connected (gameoption):", socket.id);
+
+  socket.on("getCode", async () => {
+    const code = Math.floor(Math.random() * 9000) + 1000;
+    const code_string = code.toString();
+
+    try {
+      const roomdata = await room.create({
+        roomid: code_string,
+        players: [socket.id],
+      });
+      socket.join(code_string);
+      socket.emit("message", "Room created");
+      socket.emit("roomCode", code_string);
+      console.log(roomdata);
+    } catch (err) {
+      console.error(err.message);
+    }
+  });
+
+  socket.on("verifycode", async (roomcode) => {
+    try {
+      const roomdata = await room.findOne({ roomid: roomcode.toString() });
+      if (!roomdata) {
+        socket.emit("message", "Room not found");
+        return;
+      }
+      if (roomdata.players.length >= 2) {
+        socket.emit("message", "Room full");
+        return;
+      }
+
+      roomdata.players.push(socket.id);
+      await roomdata.save();
+      socket.join(roomcode);
+      gameoption.to(roomcode).emit("message", "Joined successfully");
+    } catch (err) {
+      console.error(err.message);
+    }
+  });
+});
+
+const game = io.of("/namitgame");
+
+const winPatterns = [
+  [0,1,2],[3,4,5],[6,7,8],
+  [0,3,6],[1,4,7],[2,5,8],
+  [0,4,8],[2,4,6]
+];
+
+let games = {};
+
+game.on("connection", (socket) => {
+  console.log("Player connected:", socket.id);
+
+  socket.on("join-room", (roomCode) => {
+    socket.join(roomCode);
+    if (!games[roomCode]) {
+      games[roomCode] = {
+        board: Array(9).fill(""),
+        turn: "X",
+        scores: { X: 0, O: 0 },
+        players: {},
+      };
+    }
+
+    const roomState = games[roomCode];
+    const taken = Object.values(roomState.players);
+    if (!taken.includes("X")) roomState.players[socket.id] = "X";
+    else if (!taken.includes("O")) roomState.players[socket.id] = "O";
+    else roomState.players[socket.id] = "spectator";
+
+    socket.role = roomState.players[socket.id];
+    socket.emit("player-role", socket.role);
+    socket.emit("update-scores", roomState.scores);
+    game.to(roomCode).emit("turn-update", roomState.turn);
+  });
+
+  socket.on("box-clicked", ({ roomCode, index }) => {
+    const roomState = games[roomCode];
+    if (!roomState) return;
+
+    const { board, turn, scores, players } = roomState;
+    if (!players[socket.id]) return;
+    if (players[socket.id] !== turn) return;
+    if (board[index] !== "") return;
+
+    board[index] = turn;
+    game.to(roomCode).emit("update-box", { index, value: turn });
+
+    for (let [a,b,c] of winPatterns) {
+      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+        scores[turn]++;
+        Object.keys(players).forEach(pid => {
+          if (players[pid] === turn) game.to(pid).emit("show-winner", "🎉 You win");
+          else if (players[pid] !== "spectator") game.to(pid).emit("show-winner", "❌ You lost");
+        });
+        game.to(roomCode).emit("update-scores", scores);
+        roomState.board = Array(9).fill("");
+        roomState.turn = "X";
+        game.to(roomCode).emit("turn-update", roomState.turn);
+        return;
+      }
+    }
+
+    if (board.every(v => v !== "")) {
+      game.to(roomCode).emit("show-winner", "🤝 Draw");
+      roomState.board = Array(9).fill("");
+      roomState.turn = "X";
+      game.to(roomCode).emit("turn-update", roomState.turn);
+      return;
+    }
+
+    roomState.turn = turn === "X" ? "O" : "X";
+    game.to(roomCode).emit("turn-update", roomState.turn);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Player disconnected:", socket.id);
+    Object.keys(games).forEach(roomCode => {
+      const roomState = games[roomCode];
+      if (roomState.players[socket.id]) delete roomState.players[socket.id];
     });
+  });
+});
 
-    socket.on("verifycode", async (roomcode) => {
-        try {
-            const roomid = await room.findOne({ roomid: roomcode.toString() });
-
-            if (!roomid) {
-                console.log("Room not found");
-                socket.emit("message", "Room not found");
-                return;
-            }
-
-            if (roomid.players.includes(socket.id)) {
-                console.log(`${socket.id} already in room ${roomcode}`);
-                return;
-            }
-
-            if (roomid.players.length >= 2) {
-                console.log("Room full");
-                socket.emit("message", "Room full");
-                return;
-            }
-
-            try {
-                roomid.players.push(socket.id);
-                await roomid.save();
-            } catch (e) {
-                console.error("Error while saving updated room:", e);
-            }
-
-            if (roomid.players.length == 2) {
-                socket.join(roomcode);
-                gameoption.to(roomcode).emit("message", "Joined successfully");
-            }
-    
-
-        } catch (err) {
-            console.error("Error while searching room:", err.message);
-        }
-
-        console.log(`verifycode from ${socket.id} for room ${roomcode}`);
-    });
-
-
-})
-//app listen
-server.listen(port, () => console.log(`Server started on http://localhost:${port}`))
+server.listen(port, () => console.log(`Server started on http://localhost:${port}`));
