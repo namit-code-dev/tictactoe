@@ -10,48 +10,65 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentTurn = "";
   const roomCode = "1234";
 
-  // join room
+  // Load scores from localStorage or initialize
+  let scores = JSON.parse(localStorage.getItem("scores")) || { X: 0, O: 0 };
+  p1.innerText = scores.X;
+  p2.innerText = scores.O;
+
+  // Join room
   socket.emit("join-room", roomCode);
 
-  // get role (X / O)
+  // Get assigned role
   socket.on("player-role", (role) => {
     myRole = role;
     console.log("You are:", role);
   });
 
-  // 🔁 turn update
+  // Update turn info
   socket.on("turn-update", (turn) => {
     currentTurn = turn;
-    turnStatus.innerText =
-      turn === myRole ? "Your Turn" : "Opponent Turn";
+    turnStatus.innerText = turn === myRole ? "Your Turn" : "Opponent Turn";
   });
 
-  // box click
+  // Box click event
   boxes.forEach((box, index) => {
     box.addEventListener("click", () => {
-      //  wrong turn
-      if (currentTurn !== myRole) return;
-
+      if (currentTurn !== myRole) return; // Not your turn
       socket.emit("box-clicked", { roomCode, index });
     });
   });
 
-  // update box UI
+  // Update box UI
   socket.on("update-box", ({ index, value }) => {
     boxes[index].querySelector("h2").innerText = value;
     boxes[index].classList.add("disabled");
   });
 
-  // winner / draw
+  // Show winner or draw per turn
   socket.on("show-winner", (msg) => {
     alert(msg);
-    boxes.forEach(box => box.querySelector("h2").innerText = "");
-    window.location.href = "/gameoption";
+    boxes.forEach(box => {
+      box.querySelector("h2").innerText = "";
+      box.classList.remove("disabled");
+    });
   });
 
-  // score update
-  socket.on("update-scores", (scores) => {
+  // Update scores
+  socket.on("update-scores", (serverScores) => {
+    scores = serverScores;
     p1.innerText = scores.X;
     p2.innerText = scores.O;
+    localStorage.setItem("scores", JSON.stringify(scores));
+  });
+
+  // Game over ( after 10 turns or opponent leaves)
+  socket.on("game-over", (winner) => {
+    alert(`🏆 Game Over! Winner: ${winner}`);
+    localStorage.removeItem("scores");
+    boxes.forEach(box => {
+      box.querySelector("h2").innerText = "";
+      box.classList.remove("disabled");
+    });
+    window.location.href = "/gameoption"; // redirect to room selection
   });
 });

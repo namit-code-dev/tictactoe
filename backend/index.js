@@ -26,11 +26,13 @@ app.get("/login", (req, res) => {
   res.render("login");
 });
 
+// Game lobby namespace
 const gameoption = io.of("/gameoption");
 
 gameoption.on("connection", (socket) => {
   console.log("Client connected (gameoption):", socket.id);
 
+  // Create new room
   socket.on("getCode", async () => {
     const code = Math.floor(Math.random() * 9000) + 1000;
     const code_string = code.toString();
@@ -43,23 +45,17 @@ gameoption.on("connection", (socket) => {
       socket.join(code_string);
       socket.emit("message", "Room created");
       socket.emit("roomCode", code_string);
-      console.log(roomdata);
     } catch (err) {
       console.error(err.message);
     }
   });
 
+  // Join existing room
   socket.on("verifycode", async (roomcode) => {
     try {
       const roomdata = await room.findOne({ roomid: roomcode.toString() });
-      if (!roomdata) {
-        socket.emit("message", "Room not found");
-        return;
-      }
-      if (roomdata.players.length >= 2) {
-        socket.emit("message", "Room full");
-        return;
-      }
+      if (!roomdata) return socket.emit("message", "Room not found");
+      if (roomdata.players.length >= 2) return socket.emit("message", "Room full");
 
       roomdata.players.push(socket.id);
       await roomdata.save();
@@ -71,6 +67,7 @@ gameoption.on("connection", (socket) => {
   });
 });
 
+// Game namespace
 const game = io.of("/namitgame");
 
 const winPatterns = [
@@ -84,8 +81,10 @@ let games = {};
 game.on("connection", (socket) => {
   console.log("Player connected:", socket.id);
 
+  // Join a room
   socket.on("join-room", (roomCode) => {
     socket.join(roomCode);
+
     if (!games[roomCode]) {
       games[roomCode] = {
         board: Array(9).fill(""),
@@ -97,6 +96,8 @@ game.on("connection", (socket) => {
 
     const roomState = games[roomCode];
     const taken = Object.values(roomState.players);
+
+    // Assign role
     if (!taken.includes("X")) roomState.players[socket.id] = "X";
     else if (!taken.includes("O")) roomState.players[socket.id] = "O";
     else roomState.players[socket.id] = "spectator";
@@ -107,18 +108,19 @@ game.on("connection", (socket) => {
     game.to(roomCode).emit("turn-update", roomState.turn);
   });
 
+  // Box clicked
   socket.on("box-clicked", ({ roomCode, index }) => {
     const roomState = games[roomCode];
     if (!roomState) return;
 
     const { board, turn, scores, players } = roomState;
-    if (!players[socket.id]) return;
-    if (players[socket.id] !== turn) return;
+    if (!players[socket.id] || players[socket.id] !== turn) return;
     if (board[index] !== "") return;
 
     board[index] = turn;
     game.to(roomCode).emit("update-box", { index, value: turn });
 
+    // Check win
     for (let [a,b,c] of winPatterns) {
       if (board[a] && board[a] === board[b] && board[a] === board[c]) {
         scores[turn]++;
@@ -134,6 +136,7 @@ game.on("connection", (socket) => {
       }
     }
 
+    // Draw
     if (board.every(v => v !== "")) {
       game.to(roomCode).emit("show-winner", "🤝 Draw");
       roomState.board = Array(9).fill("");
@@ -142,15 +145,30 @@ game.on("connection", (socket) => {
       return;
     }
 
+    // Next turn
     roomState.turn = turn === "X" ? "O" : "X";
     game.to(roomCode).emit("turn-update", roomState.turn);
   });
 
+  // Handle disconnect / refresh
   socket.on("disconnect", () => {
     console.log("Player disconnected:", socket.id);
+
     Object.keys(games).forEach(roomCode => {
       const roomState = games[roomCode];
-      if (roomState.players[socket.id]) delete roomState.players[socket.id];
+      if (!roomState.players[socket.id]) return;
+
+      delete roomState.players[socket.id];
+
+      // If someone is left, notify them they win automatically
+      const remainingPlayers = Object.keys(roomState.players);
+      if (remainingPlayers.length === 1) {
+        game.to(roomCode).emit("show-winner", "🏆 Opponent left, you win!");
+      }
+
+      // Reset board for new game
+      roomState.board = Array(9).fill("");
+      roomState.turn = "X";
     });
   });
 });
