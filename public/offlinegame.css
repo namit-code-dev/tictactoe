@@ -1,0 +1,167 @@
+html, body {
+  height: 100vh;  
+  margin: 0;
+  
+}
+body{
+  background-image: url("/images/Blue\ Purple\ Gradient\ Futuristic\ Technology\ Background\ Instagram\ Story.png");
+}  
+#music{
+    height: 8vh;
+    width: 5vw;
+    margin-left: 92vw;
+}
+
+#container{
+  margin: 0;
+  display: flex;
+  justify-content: center;  /* horizontal center */
+  align-items: center;      /* vertical center */
+}
+.game-score{
+    margin: 0;
+    padding: 0;
+    background-color: rgb(160 160 174 / 19%);
+    height: 38vh;
+    width: 100%;
+}
+.game-score>h1{
+   
+    width: 100%;
+    margin: 1vh;
+    text-align:center ;
+    text-shadow: 5px 5px 10px goldenrod;
+
+}
+#person{
+    display: flex;
+     justify-content: space-between;
+  
+}
+.per1{
+    height: 100%;
+    margin-left: 5vh;
+    margin-right:5vh;
+   
+}
+.per1>img{
+   display: flex;
+   justify-content: center;
+    height: 9vh;
+    width: 9vh;
+   align-items: center;
+}
+.boxes {
+  height: fit-content;
+  width: 60vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  margin-top: 71px;
+  
+  
+}
+.box{
+    height: 16vh;
+    width: 19vh;
+    margin: -4px;
+    background-color: rgb(235 242 240 / 43%)
+}
+#box2,#box5,#box8{
+  border-left: 5px black solid;
+  border-right: 5px black solid;
+}
+#box4,#box5,#box6{
+  border-top: 5px black solid;
+  border-bottom: 5px black solid;
+}
+.per1>h3{
+  text-align: center;
+}
+.box>h2{
+text-align: center;
+font-size: 3rem;
+  font-weight: bold;
+   background: linear-gradient(
+    90deg,
+    #FF3C38 0%,
+    #FF3C38 33.3%,
+    #FDD835 33.3%,
+    #FDD835 66.6%,
+    #2196F3 66.6%,
+    #2196F3 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+}
+.disabled {
+  pointer-events: none; 
+}
+.enabled {
+ pointer-events: auto;  
+}
+
+#winner{
+ font-size: larger;
+ text-align:center ;
+ font-weight: bold;
+ color: antiquewhite;
+text-shadow: 5px 5px 10px goldenrod;
+}
+
+
+
+
+/* responsiveness*/
+@media (min-width: 250px) and (max-width: 767px) {
+   body {
+    font-size: 14px;
+  }
+  h2,h3{
+          font-size: 17px;;
+  }
+.boxes {
+    height: fit-content;
+    width: auto;
+    margin-top: 15vh;
+}
+.box {
+        height: 13vh;
+        width: 26vw;
+    }
+
+#music {
+        height: 7vh;
+        width: 13vw;
+        margin-left: 85vw;
+}
+.game-score {
+    height: 42vh;
+}
+.game-score>h1 {
+
+  font-size: clamp(18px, 5vw, 32px);
+ text-shadow: 5px 5px 10px goldenrod;
+
+}
+}
+#container {
+   margin-top: -39px;
+}
+.box>h2 {
+    font-size: 2rem;
+
+}
+
+
+
+
+
+
+
+
+
+
