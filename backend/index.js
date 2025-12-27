@@ -30,6 +30,9 @@ app.get("/login", (req, res) => {
   res.render("login");
 });
 
+app.get("/offlinegame", (req, res) => {
+ res.sendFile(path.join(__dirname, "../public/offlinegame.html"));
+});
 // Game lobby namespace
 const gameoption = io.of("/gameoption");
 

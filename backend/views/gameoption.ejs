@@ -105,7 +105,7 @@
     <!-- Offline Player -->
     <div class="card">
       <h2>Offline Player</h2>
-      <button>Play Offline</button>
+      <button id="offlinegame">Play Offline</button>
     </div>
      
   </div>
@@ -168,6 +168,9 @@ socket.on("message",(data)=>{
     console.error("Error while joining");
   }
 })
+offlinegame.addEventListener("click", () => {
+  window.location.href="/offlinegame"
+});
 
 </script>
 </html>
