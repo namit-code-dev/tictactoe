@@ -22,6 +22,10 @@ app.set("view engine", "ejs");
 app.set("views", __dirname + "/views");
 app.use(express.static(path.join(__dirname, "namitgame")));
 
+app.get("/",(req,res)=>{
+  res.sendFile(path.join(__dirname, "../public/frontpage.html"));
+});
+
 app.get("/login", (req, res) => {
   res.render("login");
 });
