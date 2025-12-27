@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Start Game</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      background-image: url("/docs/image.png"); /* FIXED path */
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .container {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    button {
+      height: 60px;
+      width: 180px;
+      font-size: 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #c3aa6b;
+      color: white;
+      border: 3px solid black;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background-color: #bb7eb2;
+      transform: scale(1.05);
+      border: 3px solid black;
+         border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <button id="startButton">Start Now</button>
+  </div>
+
+  <script>
+    document.getElementById("startButton").addEventListener("click", () => {
+      window.location.href = "/signup";
+    });
+  </script>
+</body>
+</html>   
